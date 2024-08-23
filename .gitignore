@@ -1,2 +1,2 @@
-# Compiled / DLL files
-__pycache__/
+node_modules
+.env
