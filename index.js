@@ -2,13 +2,18 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const http = require('http').Server(app);
+var path = require('path');
+var static = path.join(__dirname, 'static');
 const PORT = 4000;
 const socketIO = require('socket.io')(http, {
   cors: {
     origin: 'http://localhost:3000',
   },
 });
+const Dbo = require('./db/dbo.js');
+const dbo = new Dbo();
 const battleHelper = require('./helpers/battleHelper');
+const dataProcessingHelper = require('./helpers/dataProcessingHelper');
 
 app.use(cors());
 let users = [];
@@ -20,7 +25,61 @@ socketIO.on('connection', socket => {
   users.push({
     id: socket.id,
   });
-  socketIO.to(socket.id).emit('connectionSuccessful', users.length);
+  socketIO.to(socket.id).emit('connectionSuccessful');
+
+  // Get user
+  socket.on('getUser', userInfo => {
+    dbo
+      .getUser(userInfo)
+      .then(user => {
+        socketIO.to(socket.id).emit('userData', dataProcessingHelper.processUser(user));
+      })
+      .catch(err => {
+        console.log(`Something went wrong loading user: ${err}`);
+      });
+  });
+
+  // Update user preferences
+  socket.on('updateUserPreferences', userPreferences => {
+    dbo
+      .setUserPreferences(userPreferences)
+      .then(result => {
+        const x = result;
+      })
+      .catch(err => {
+        console.log(`Something went wrong updating user preferences: ${err}`);
+      });
+  });
+
+  socket.on('getDailyGameTargets', () => {
+    dbo
+      .getDailyGameTargets()
+      .then(targets => {
+        socketIO.to(socket.id).emit('dailyGameTargets', dataProcessingHelper.processDailyGameTargets(targets));
+      })
+      .catch(err => {
+        console.log(`Something went wrong loading daily game targets: ${err}`);
+      });
+  });
+
+  socket.on('getUserDailyGames', userId => {
+    dbo
+      .getUserDailyGames(userId)
+      .then(userDailyGames => {
+        socketIO.to(socket.id).emit('userDailyGames', dataProcessingHelper.processUserDailyGames(userDailyGames));
+      })
+      .catch(err => {
+        console.log(`Something went wrong loading user daily games: ${err}`);
+      });
+  });
+
+  socket.on('guessSubmitted', guess => {
+    if (guess.userId) dbo.handleDailyGameGuess(guess.userId, guess.player, guess.today);
+  });
+
+  socket.on('dailyGameOver', gameInfo => {
+    if (gameInfo.userId) dbo.handleDailyGameOver(gameInfo);
+  });
 
   // User enters lobby.  Attempts to find a game for them
   socket.on('enterLobby', username => {
@@ -103,6 +162,11 @@ socketIO.on('connection', socket => {
     socketIO.emit('newUserResponse', users);
     socket.disconnect();
   });
+});
+
+// Return static page for root GET
+app.get('/', (req, res) => {
+  res.sendfile(path.join(static, 'root.html'));
 });
 
 http.listen(PORT, () => {
