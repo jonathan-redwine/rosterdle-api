@@ -1,4 +1,6 @@
 const express = require('express');
+const configDotenv = require('dotenv');
+configDotenv.configDotenv();
 const app = express();
 const cors = require('cors');
 const http = require('http').Server(app);
@@ -7,7 +9,7 @@ var static = path.join(__dirname, 'static');
 const PORT = 4000;
 const socketIO = require('socket.io')(http, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_APP_ORIGIN,
   },
 });
 const Dbo = require('./db/dbo.js');
