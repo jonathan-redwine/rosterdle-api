@@ -12,14 +12,17 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "type": "module",
     "dependencies": {
         "cors": "^2.8.5",
         "dotenv": "^16.4.5",
         "express": "^4.18.1",
+        "morgan": "^1.10.0",
         "mssql": "^11.0.1",
         "nodemon": "^2.0.19",
         "path": "^0.12.7",
         "pm2": "^5.4.2",
-        "socket.io": "^4.5.1"
+        "socket.io": "^4.5.1",
+        "winston": "^3.14.2"
     }
 }

@@ -1,4 +1,4 @@
-class QueryHelper {
+export default class QueryHelper {
   constructor() {}
 
   getUserQuery() {
@@ -136,5 +136,3 @@ class QueryHelper {
               game_date = @gameDate`;
   }
 }
-
-module.exports = QueryHelper;

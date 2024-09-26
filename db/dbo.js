@@ -1,13 +1,13 @@
-const sql = require('mssql');
-const configDotenv = require('dotenv');
-const QueryHelper = require('../helpers/queryHelper.js');
+import sql from 'mssql';
+import { configDotenv } from 'dotenv';
+import QueryHelper from '../helpers/queryHelper.js';
 
-class Dbo {
+export default class Dbo {
   static instance_;
 
   constructor() {
     if (this.instance_) return this.instance_; // return instance if already declared
-    configDotenv.configDotenv();
+    configDotenv();
     this.instance_ = this;
     this.config = {
       user: process.env.DB_USER,
@@ -193,5 +193,3 @@ class Dbo {
     });
   }
 }
-
-module.exports = Dbo;
