@@ -35,7 +35,7 @@ app.use(morgan('dev'));
 // Configure the socket server
 const io = new Server(app.server, {
   cors: {
-    origin: process.env.CORS_APP_ORIGIN,
+    origin: 'https://rosterdle.com',
   },
 });
 let users = [];
