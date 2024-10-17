@@ -15,7 +15,11 @@ const battleHelper = new BattleHelper();
 const dataProcessingHelper = new DataProcessingHelper();
 
 let app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'https://rosterdle.com',
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.server = http.createServer(app);
 
 // Configure the logger
